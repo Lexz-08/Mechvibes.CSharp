@@ -141,6 +141,7 @@ namespace Mechvibes.CSharp
 			{
 				WindowsMediaPlayer player = new WindowsMediaPlayer();
 				player.URL = currentSoundpack.GetBindedAudio(KeymapHelper.GetSoundPackKey(e.KeyCode));
+				player.settings.volume = trckVolume.Value;
 				player.controls.play();
 
 				prevKey = e.KeyCode;
