@@ -3,6 +3,7 @@
 A C# remake of Mechvibes, with compatibility of the soundpacks so that you can load your soundpacks into both programs.
 
 ## Download
+[Setup Video (mkv)](https://github.com/Lexz-08/Mechvibes.CSharp/raw/master/Setup%20Mechvibes%20Folder%20Without%20Mechvibes%20Installed.mkv)<br/>
 [Release](https://github.com/Lexz-08/Mechvibes.CSharp/releases/mechvibes-remake) - [**Mechvibes.CSharp.exe**](https://github.com/Lexz-08/Mechvibes.CSharp/releases/download/mechvibes-remake/Mechvibes.CSharp.exe)
 
 ## SoundPack Format (`config.json` format)
