@@ -1,5 +1,6 @@
 ﻿using Gma.UserActivityMonitor;
 using Microsoft.Win32;
+using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,8 +8,8 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows.Forms;
-using WMPLib;
 
 namespace Mechvibes.CSharp
 {
@@ -39,6 +40,7 @@ namespace Mechvibes.CSharp
 			btnShowSoundPackFolder.Click += new EventHandler(Unfocus);
 			btnOpenSoundEditor.Click += new EventHandler(Unfocus);
 
+			picMinimizeToSystemTray.Image = Bitmaps.Instance[32, Color.Gray, Color.White, BitmapType.DownArrow];
 			picMinimize.Image = Bitmaps.Instance[32, Color.Gray, Color.White, BitmapType.Minimize];
 			picClose.Image = Bitmaps.Instance[32, Color.Black, Color.White, BitmapType.Close];
 
@@ -70,6 +72,10 @@ namespace Mechvibes.CSharp
 				SendMessage(Handle, 161, 2, 0);
 			}
 		}
+		private void UnminimizeWindowToNormal(object sender, EventArgs e)
+		{
+			Visible = true;
+		}
 		private void MinimizeToSystemTray(object sender, EventArgs e)
 		{
 			Visible = false;
@@ -82,6 +88,9 @@ namespace Mechvibes.CSharp
 		{
 			Application.Exit();
 		}
+
+		private void MinimizeSysTray_MouseEnter(object sender, EventArgs e) => picMinimizeToSystemTray.BackColor = SystemColors.Control;
+		private void MinimizeSysTray_MouseLeave(object sender, EventArgs e) => picMinimizeToSystemTray.BackColor = Color.White;
 
 		private void Minimize_MouseEnter(object sender, EventArgs e) => picMinimize.BackColor = SystemColors.Control;
 		private void Minimize_MouseLeave(object sender, EventArgs e) => picMinimize.BackColor = Color.White;
@@ -107,6 +116,7 @@ namespace Mechvibes.CSharp
 		private SoundPack currentSoundpack;
 
 		private Keys prevKey = Keys.None;
+		private int audioVolume = 50;
 
 		private void LoadSoundPacks()
 		{
@@ -135,22 +145,26 @@ namespace Mechvibes.CSharp
 			HookManager.KeyUp += new KeyEventHandler(Keyboard_KeyUp);
 		}
 
-		private void Keyboard_KeyDown(object sender, KeyEventArgs e)
+		private async void Keyboard_KeyDown(object sender, KeyEventArgs e)
 		{
-			if (e.KeyCode != prevKey)
+			await Task.Run(() =>
 			{
-				WindowsMediaPlayer player = new WindowsMediaPlayer();
-				player.URL = currentSoundpack.GetBindedAudio(KeymapHelper.GetSoundPackKey(e.KeyCode));
-				player.settings.volume = trckVolume.Value;
-				player.controls.play();
+				if (e.KeyCode != prevKey)
+				{
+					WaveOutEvent outputDevice = new WaveOutEvent();
+					AudioFileReader audioFile = new AudioFileReader(currentSoundpack.GetBindedAudio(KeymapHelper.GetSoundPackKey(e.KeyCode)));
+					outputDevice.Init(audioFile);
+					outputDevice.Volume = audioVolume / 100.0f;
+					outputDevice.Play();
 
-				prevKey = e.KeyCode;
-			}
+					prevKey = e.KeyCode;
+				}
+			});
 		}
 
-		private void Keyboard_KeyUp(object sender, KeyEventArgs e)
+		private async void Keyboard_KeyUp(object sender, KeyEventArgs e)
 		{
-			if (e.KeyCode == prevKey) prevKey = Keys.None;
+			if (e.KeyCode == prevKey) await Task.Run(() => prevKey = Keys.None);
 		}
 
 		private void SoundPackSelected(object sender, EventArgs e)
@@ -161,9 +175,9 @@ namespace Mechvibes.CSharp
 		private void VolumeChanged(object sender, EventArgs e)
 		{
 			if (sender == trckVolume)
-				numVolume.Value = trckVolume.Value;
+				numVolume.Value = audioVolume = trckVolume.Value;
 			else if (sender == numVolume)
-				trckVolume.Value = (int)numVolume.Value;
+				trckVolume.Value = audioVolume = (int)numVolume.Value;
 		}
 
 		private void ReloadSoundPacks(object sender, EventArgs e) => LoadSoundPacks();

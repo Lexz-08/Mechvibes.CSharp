@@ -31,6 +31,7 @@
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
 			this.pnlCaptionBar = new System.Windows.Forms.Panel();
+			this.picMinimizeToSystemTray = new System.Windows.Forms.PictureBox();
 			this.picMinimize = new System.Windows.Forms.PictureBox();
 			this.picClose = new System.Windows.Forms.PictureBox();
 			this.lblTitle = new System.Windows.Forms.Label();
@@ -50,8 +51,9 @@
 			this.picSeparator2 = new System.Windows.Forms.PictureBox();
 			this.numVolume = new System.Windows.Forms.NumericUpDown();
 			this.trckVolume = new System.Windows.Forms.TrackBar();
-			this.picMinimizeToSystemTray = new System.Windows.Forms.PictureBox();
+			this.trayicon = new System.Windows.Forms.NotifyIcon(this.components);
 			this.pnlCaptionBar.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.picMinimizeToSystemTray)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.picMinimize)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.picClose)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.picIcon)).BeginInit();
@@ -61,7 +63,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.picSeparator2)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.numVolume)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.trckVolume)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.picMinimizeToSystemTray)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// pnlCaptionBar
@@ -77,6 +78,20 @@
 			this.pnlCaptionBar.Size = new System.Drawing.Size(426, 44);
 			this.pnlCaptionBar.TabIndex = 0;
 			this.pnlCaptionBar.MouseDown += new System.Windows.Forms.MouseEventHandler(this.DragForm);
+			// 
+			// picMinimizeToSystemTray
+			// 
+			this.picMinimizeToSystemTray.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.picMinimizeToSystemTray.Location = new System.Drawing.Point(324, 6);
+			this.picMinimizeToSystemTray.Name = "picMinimizeToSystemTray";
+			this.picMinimizeToSystemTray.Size = new System.Drawing.Size(32, 32);
+			this.picMinimizeToSystemTray.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+			this.picMinimizeToSystemTray.TabIndex = 5;
+			this.picMinimizeToSystemTray.TabStop = false;
+			this.tooltip.SetToolTip(this.picMinimizeToSystemTray, "Minimize the window to the system tray");
+			this.picMinimizeToSystemTray.Click += new System.EventHandler(this.MinimizeToSystemTray);
+			this.picMinimizeToSystemTray.MouseEnter += new System.EventHandler(this.MinimizeSysTray_MouseEnter);
+			this.picMinimizeToSystemTray.MouseLeave += new System.EventHandler(this.MinimizeSysTray_MouseLeave);
 			// 
 			// picMinimize
 			// 
@@ -278,18 +293,14 @@
 			this.trckVolume.Value = 50;
 			this.trckVolume.ValueChanged += new System.EventHandler(this.VolumeChanged);
 			// 
-			// picMinimizeToSystemTray
+			// trayicon
 			// 
-			this.picMinimizeToSystemTray.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.picMinimizeToSystemTray.Location = new System.Drawing.Point(324, 6);
-			this.picMinimizeToSystemTray.Name = "picMinimizeToSystemTray";
-			this.picMinimizeToSystemTray.Size = new System.Drawing.Size(32, 32);
-			this.picMinimizeToSystemTray.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-			this.picMinimizeToSystemTray.TabIndex = 5;
-			this.picMinimizeToSystemTray.TabStop = false;
-			this.tooltip.SetToolTip(this.picMinimizeToSystemTray, "Minimize the window");
+			this.trayicon.Icon = ((System.Drawing.Icon)(resources.GetObject("trayicon.Icon")));
+			this.trayicon.Text = "Mechvibes.CSharp";
+			this.trayicon.Visible = true;
+			this.trayicon.DoubleClick += new System.EventHandler(this.UnminimizeWindowToNormal);
 			// 
-			// Form1
+			// MainForm
 			// 
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
 			this.BackColor = System.Drawing.Color.White;
@@ -315,11 +326,12 @@
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.MaximizeBox = false;
 			this.MinimizeBox = false;
-			this.Name = "Form1";
+			this.Name = "MainForm";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "Mechvibes.CSharp";
 			this.pnlCaptionBar.ResumeLayout(false);
 			this.pnlCaptionBar.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.picMinimizeToSystemTray)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.picMinimize)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.picClose)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.picIcon)).EndInit();
@@ -329,7 +341,6 @@
 			((System.ComponentModel.ISupportInitialize)(this.picSeparator2)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.numVolume)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.trckVolume)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.picMinimizeToSystemTray)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -358,6 +369,7 @@
 		private System.Windows.Forms.NumericUpDown numVolume;
 		private System.Windows.Forms.TrackBar trckVolume;
 		private System.Windows.Forms.PictureBox picMinimizeToSystemTray;
+		private System.Windows.Forms.NotifyIcon trayicon;
 	}
 }
 

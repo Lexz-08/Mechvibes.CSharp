@@ -23,7 +23,7 @@ namespace Mechvibes.CSharp
 
 		private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs e)
 		{
-			if (!(e.Name.StartsWith("WinTitleBitmaps") || e.Name.StartsWith("Newtonsoft.Json")))
+			if (e.Name.StartsWith("Mechvibes.CSharp.resources"))
 				return e.RequestingAssembly;
 
 			using (Stream s = Assembly.GetExecutingAssembly().GetManifestResourceStream($"Mechvibes.CSharp.Libraries.{e.Name.Split(',')[0]}.dll"))
