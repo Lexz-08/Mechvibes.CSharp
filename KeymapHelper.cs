@@ -72,7 +72,7 @@ namespace Mechvibes.CSharp
 
 			{ 26, Key.OpenBracket  },
 			{ 27, Key.CloseBracket },
-			{ 43, Key.CloseBracket },
+			{ 43, Key.BackSlash },
 
 			{ 39, Key.Semicolon  },
 			{ 40, Key.Apostrophe },
