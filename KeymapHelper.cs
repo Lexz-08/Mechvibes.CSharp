@@ -108,7 +108,7 @@ namespace Mechvibes.CSharp
 			{ 3640, Key.RightAlt     },
 			{ 3675, Key.LeftWin      },
 			{ 3676, Key.RightWin     },
-			{ 3677, Key.Apps         },
+			{ 3677, Key.Menu         },
 
 			{ 61010, Key.Insert },
 			{ 61011, Key.Delete },
@@ -252,6 +252,7 @@ namespace Mechvibes.CSharp
 				case Keys.Space: return Key.Space;
 				case Keys.RMenu: return Key.RightAlt;
 				case Keys.RWin: return Key.RightWin;
+				case Keys.Apps: return Key.Menu;
 				case Keys.RControlKey: return Key.RightControl;
 				case Keys.Left: return Key.LeftArrow;
 				case Keys.Down: return Key.DownArrow;
@@ -359,6 +360,7 @@ namespace Mechvibes.CSharp
 				case Key.Space: return Keys.Space;
 				case Key.RightAlt: return Keys.RMenu;
 				case Key.RightWin: return Keys.RWin;
+				case Key.Menu: return Keys.Apps;
 				case Key.RightControl: return Keys.RControlKey;
 				case Key.LeftArrow: return Keys.Left;
 				case Key.DownArrow: return Keys.Down;

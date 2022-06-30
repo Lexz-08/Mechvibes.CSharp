@@ -102,7 +102,7 @@
 		RightAlt,
 		RightWin,
 		RightControl,
-		Apps,
+		Menu,
 		LeftArrow,
 		DownArrow,
 		RightArrow,
