@@ -17,7 +17,7 @@ namespace Mechvibes.CSharp
 				{
 					throw new Exception("Cannot load multi-key soundpack from a single-key manifest. Please provide a multi-key soundpack file.");
 				}
-				catch (Exception exc)
+				catch
 				{
 					MessageBox.Show("Cannot load multi-key soundpack from a single-key manifest. Please provide a multi-key soundpack file.", "Pack Specified Is Not Multi-Key",
 						MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -65,14 +65,18 @@ namespace Mechvibes.CSharp
 			foreach (JProperty keybind in defines.Properties())
 			{
 				Key key = KeymapHelper.GetKeyFromManifest(int.Parse(keybind.Name));
-				JArray audioPoints = JArray.Parse(keybind.Value.ToString());
-				AudioRange audioInfo = new AudioRange
-				{
-					Position = int.Parse(audioPoints[0].ToString()),
-					Duration = int.Parse(audioPoints[1].ToString()),
-				};
+				JArray audioPoints = defines[keybind.Name] as JArray;
 
-				keybinds.Add((key, audioInfo));
+				if (audioPoints != null)
+				{
+					AudioRange audioInfo = new AudioRange
+					{
+						Position = int.Parse(audioPoints[0].ToString()),
+						Duration = int.Parse(audioPoints[1].ToString()),
+					};
+
+					keybinds.Add((key, audioInfo));
+				}
 			}
 
 			return new SingleKeySoundPack(name, Path.GetDirectoryName(JSONFile) + "\\" + packInfo["sound"], keybinds);
