@@ -11,7 +11,7 @@ namespace Mechvibes.CSharp
 		public string Name => packName;
 		public List<Keymap> Keybinds => keybinds;
 
-		public bool IncludesNumPad
+		public virtual bool IncludesNumPad
 		{
 			get
 			{
@@ -30,20 +30,23 @@ namespace Mechvibes.CSharp
 			packName = Packname;
 			keybinds = Keybinds.Where(keymap => keymap.Keybind != Key.Unsupported).ToList();
 
-			for (int i = 0; i < keybinds.Count - 1; i++)
-				for (int j = 1; j < keybinds.Count; j++)
-					if (KeymapHelper.GetCodeFromKey(keybinds[j].Keybind) > KeymapHelper.GetCodeFromKey(keybinds[i].Keybind))
-					{
-						Keymap temp_ = keybinds[i];
+			if (keybinds.Count >= 1)
+			{
+				for (int i = 0; i < keybinds.Count - 1; i++)
+					for (int j = 1; j < keybinds.Count; j++)
+						if (KeymapHelper.GetCodeFromKey(keybinds[j].Keybind) > KeymapHelper.GetCodeFromKey(keybinds[i].Keybind))
+						{
+							Keymap temp_ = keybinds[i];
 
-						keybinds[i] = keybinds[j];
-						keybinds[j] = temp_;
-					}
+							keybinds[i] = keybinds[j];
+							keybinds[j] = temp_;
+						}
 
-			Keymap temp__ = keybinds[0];
+				Keymap temp__ = keybinds[0];
 
-			keybinds[0] = keybinds[keybinds.Count - 1];
-			keybinds[keybinds.Count - 1] = temp__;
+				keybinds[0] = keybinds[keybinds.Count - 1];
+				keybinds[keybinds.Count - 1] = temp__;
+			}
 		}
 
 		public string GetBindedAudio(Key Keybind)

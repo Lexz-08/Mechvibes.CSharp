@@ -83,6 +83,10 @@
       <HintPath>packages\NAudio.WinMM.2.1.0\lib\netstandard2.0\NAudio.WinMM.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Security.AccessControl, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -100,6 +104,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AudioRange.cs" />
+    <Compile Include="Gma.UserActivityMonitor\KeyDownExtArgs.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -119,6 +125,7 @@
     <Compile Include="KeymapHelper.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SingleKeySoundPack.cs" />
     <Compile Include="SoundEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -171,6 +178,7 @@
     <EmbeddedResource Include="Libraries\NAudio.WinMM.dll" />
     <EmbeddedResource Include="Libraries\System.Security.AccessControl.dll" />
     <EmbeddedResource Include="Libraries\System.Security.Principal.Windows.dll" />
+    <EmbeddedResource Include="Libraries\Newtonsoft.Json.dll" />
     <Content Include="mechvibes-icon.ico" />
     <None Include="Resources\keyboard.jpeg" />
   </ItemGroup>
@@ -186,5 +194,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

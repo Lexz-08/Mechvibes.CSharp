@@ -330,7 +330,7 @@ namespace Gma.UserActivityMonitor
                 if (s_KeyDown != null && (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN))
                 {
                     Keys keyData = (Keys)MyKeyboardHookStruct.VirtualKeyCode;
-                    KeyEventArgs e = new KeyEventArgs(keyData);
+                    KeyEventExtArgs e = new KeyEventExtArgs(keyData, MyKeyboardHookStruct.Flags == 1);
                     s_KeyDown.Invoke(null, e);
                     handled = e.Handled;
                 }

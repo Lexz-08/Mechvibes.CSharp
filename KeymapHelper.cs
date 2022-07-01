@@ -155,8 +155,11 @@ namespace Mechvibes.CSharp
 
 		public static int GetCodeFromKey(Key Key) => keycodes.Where(keycode => keycode.Value == Key).First().Key;
 
-		public static Key GetSoundPackKey(Keys WindowsKey)
+		public static Key GetSoundPackKey(Keys WindowsKey, bool Extended = false)
 		{
+			if (WindowsKey == Keys.Return && Extended)
+				return Key.NumPadEnter;
+
 			switch (WindowsKey)
 			{
 				case Keys.Escape: return Key.Escape;
@@ -263,111 +266,114 @@ namespace Mechvibes.CSharp
 			}
 		}
 
-		public static Keys GetWindowsKey(Key Keybind)
+		public static (Keys, bool) GetWindowsKey(Key Keybind)
 		{
+			if (Keybind == Key.NumPadEnter)
+				return (Keys.Return, true);
+
 			switch (Keybind)
 			{
-				case Key.Escape: return Keys.Escape;
-				case Key.F1: return Keys.F1;
-				case Key.F2: return Keys.F2;
-				case Key.F3: return Keys.F3;
-				case Key.F4: return Keys.F4;
-				case Key.F5: return Keys.F5;
-				case Key.F6: return Keys.F6;
-				case Key.F7: return Keys.F7;
-				case Key.F8: return Keys.F8;
-				case Key.F9: return Keys.F9;
-				case Key.F10: return Keys.F10;
-				case Key.F11: return Keys.F11;
-				case Key.F12: return Keys.F12;
-				case Key.Tilde: return Keys.Oemtilde;
-				case Key.D1: return Keys.D1;
-				case Key.D2: return Keys.D2;
-				case Key.D3: return Keys.D3;
-				case Key.D4: return Keys.D4;
-				case Key.D5: return Keys.D5;
-				case Key.D6: return Keys.D6;
-				case Key.D7: return Keys.D7;
-				case Key.D8: return Keys.D8;
-				case Key.D9: return Keys.D9;
-				case Key.D0: return Keys.D0;
-				case Key.Hyphen: return Keys.OemMinus;
-				case Key.Equals: return Keys.Oemplus;
-				case Key.Backspace: return Keys.Back;
-				case Key.Insert: return Keys.Insert;
-				case Key.Home: return Keys.Home;
-				case Key.PageUp: return Keys.PageUp;
-				case Key.NumLock: return Keys.NumLock;
-				case Key.Divide: return Keys.Divide;
-				case Key.Multiply: return Keys.Multiply;
-				case Key.Subtract: return Keys.Subtract;
-				case Key.Tab: return Keys.Tab;
-				case Key.Q: return Keys.Q;
-				case Key.W: return Keys.W;
-				case Key.E: return Keys.E;
-				case Key.R: return Keys.R;
-				case Key.T: return Keys.T;
-				case Key.Y: return Keys.Y;
-				case Key.U: return Keys.U;
-				case Key.I: return Keys.I;
-				case Key.O: return Keys.O;
-				case Key.P: return Keys.P;
-				case Key.OpenBracket: return Keys.OemOpenBrackets;
-				case Key.CloseBracket: return Keys.Oem6;
-				case Key.BackSlash: return Keys.Oem5;
-				case Key.Delete: return Keys.Delete;
-				case Key.End: return Keys.End;
-				case Key.PageDown: return Keys.PageDown;
-				case Key.NumPad7: return Keys.NumPad7;
-				case Key.NumPad8: return Keys.NumPad8;
-				case Key.NumPad9: return Keys.NumPad9;
-				case Key.Add: return Keys.Add;
-				case Key.CapsLock: return Keys.CapsLock;
-				case Key.A: return Keys.A;
-				case Key.S: return Keys.S;
-				case Key.D: return Keys.D;
-				case Key.F: return Keys.F;
-				case Key.G: return Keys.G;
-				case Key.H: return Keys.H;
-				case Key.J: return Keys.J;
-				case Key.K: return Keys.K;
-				case Key.L: return Keys.L;
-				case Key.Semicolon: return Keys.Oem1;
-				case Key.Apostrophe: return Keys.Oem7;
-				case Key.Enter: return Keys.Return;
-				case Key.NumPad4: return Keys.NumPad4;
-				case Key.NumPad5: return Keys.NumPad5;
-				case Key.NumPad6: return Keys.NumPad6;
-				case Key.LeftShift: return Keys.LShiftKey;
-				case Key.Z: return Keys.Z;
-				case Key.X: return Keys.X;
-				case Key.C: return Keys.C;
-				case Key.V: return Keys.V;
-				case Key.B: return Keys.B;
-				case Key.N: return Keys.N;
-				case Key.M: return Keys.M;
-				case Key.Comma: return Keys.Oemcomma;
-				case Key.Period: return Keys.OemPeriod;
-				case Key.ForwardSlash: return Keys.OemQuestion;
-				case Key.RightShift: return Keys.RShiftKey;
-				case Key.UpArrow: return Keys.Up;
-				case Key.NumPad1: return Keys.NumPad1;
-				case Key.NumPad2: return Keys.NumPad2;
-				case Key.NumPad3: return Keys.NumPad3;
-				case Key.LeftControl: return Keys.LControlKey;
-				case Key.LeftWin: return Keys.LWin;
-				case Key.LeftAlt: return Keys.LMenu;
-				case Key.Space: return Keys.Space;
-				case Key.RightAlt: return Keys.RMenu;
-				case Key.RightWin: return Keys.RWin;
-				case Key.Menu: return Keys.Apps;
-				case Key.RightControl: return Keys.RControlKey;
-				case Key.LeftArrow: return Keys.Left;
-				case Key.DownArrow: return Keys.Down;
-				case Key.RightArrow: return Keys.Right;
-				case Key.NumPad0: return Keys.NumPad0;
-				case Key.Decimal: return Keys.Decimal;
-				default: return Keys.None;
+				case Key.Escape: return (Keys.Escape, false);
+				case Key.F1: return (Keys.F1, false);
+				case Key.F2: return (Keys.F2, false);
+				case Key.F3: return (Keys.F3, false);
+				case Key.F4: return (Keys.F4, false);
+				case Key.F5: return (Keys.F5, false);
+				case Key.F6: return (Keys.F6, false);
+				case Key.F7: return (Keys.F7, false);
+				case Key.F8: return (Keys.F8, false);
+				case Key.F9: return (Keys.F9, false);
+				case Key.F10: return (Keys.F10, false);
+				case Key.F11: return (Keys.F11, false);
+				case Key.F12: return (Keys.F12, false);
+				case Key.Tilde: return (Keys.Oemtilde, false);
+				case Key.D1: return (Keys.D1, false);
+				case Key.D2: return (Keys.D2, false);
+				case Key.D3: return (Keys.D3, false);
+				case Key.D4: return (Keys.D4, false);
+				case Key.D5: return (Keys.D5, false);
+				case Key.D6: return (Keys.D6, false);
+				case Key.D7: return (Keys.D7, false);
+				case Key.D8: return (Keys.D8, false);
+				case Key.D9: return (Keys.D9, false);
+				case Key.D0: return (Keys.D0, false);
+				case Key.Hyphen: return (Keys.OemMinus, false);
+				case Key.Equals: return (Keys.Oemplus, false);
+				case Key.Backspace: return (Keys.Back, false);
+				case Key.Insert: return (Keys.Insert, false);
+				case Key.Home: return (Keys.Home, false);
+				case Key.PageUp: return (Keys.PageUp, false);
+				case Key.NumLock: return (Keys.NumLock, false);
+				case Key.Divide: return (Keys.Divide, false);
+				case Key.Multiply: return (Keys.Multiply, false);
+				case Key.Subtract: return (Keys.Subtract, false);
+				case Key.Tab: return (Keys.Tab, false);
+				case Key.Q: return (Keys.Q, false);
+				case Key.W: return (Keys.W, false);
+				case Key.E: return (Keys.E, false);
+				case Key.R: return (Keys.R, false);
+				case Key.T: return (Keys.T, false);
+				case Key.Y: return (Keys.Y, false);
+				case Key.U: return (Keys.U, false);
+				case Key.I: return (Keys.I, false);
+				case Key.O: return (Keys.O, false);
+				case Key.P: return (Keys.P, false);
+				case Key.OpenBracket: return (Keys.OemOpenBrackets, false);
+				case Key.CloseBracket: return (Keys.Oem6, false);
+				case Key.BackSlash: return (Keys.Oem5, false);
+				case Key.Delete: return (Keys.Delete, false);
+				case Key.End: return (Keys.End, false);
+				case Key.PageDown: return (Keys.PageDown, false);
+				case Key.NumPad7: return (Keys.NumPad7, false);
+				case Key.NumPad8: return (Keys.NumPad8, false);
+				case Key.NumPad9: return (Keys.NumPad9, false);
+				case Key.Add: return (Keys.Add, false);
+				case Key.CapsLock: return (Keys.CapsLock, false);
+				case Key.A: return (Keys.A, false);
+				case Key.S: return (Keys.S, false);
+				case Key.D: return (Keys.D, false);
+				case Key.F: return (Keys.F, false);
+				case Key.G: return (Keys.G, false);
+				case Key.H: return (Keys.H, false);
+				case Key.J: return (Keys.J, false);
+				case Key.K: return (Keys.K, false);
+				case Key.L: return (Keys.L, false);
+				case Key.Semicolon: return (Keys.Oem1, false);
+				case Key.Apostrophe: return (Keys.Oem7, false);
+				case Key.Enter: return (Keys.Return, false);
+				case Key.NumPad4: return (Keys.NumPad4, false);
+				case Key.NumPad5: return (Keys.NumPad5, false);
+				case Key.NumPad6: return (Keys.NumPad6, false);
+				case Key.LeftShift: return (Keys.LShiftKey, false);
+				case Key.Z: return (Keys.Z, false);
+				case Key.X: return (Keys.X, false);
+				case Key.C: return (Keys.C, false);
+				case Key.V: return (Keys.V, false);
+				case Key.B: return (Keys.B, false);
+				case Key.N: return (Keys.N, false);
+				case Key.M: return (Keys.M, false);
+				case Key.Comma: return (Keys.Oemcomma, false);
+				case Key.Period: return (Keys.OemPeriod, false);
+				case Key.ForwardSlash: return (Keys.OemQuestion, false);
+				case Key.RightShift: return (Keys.RShiftKey, false);
+				case Key.UpArrow: return (Keys.Up, false);
+				case Key.NumPad1: return (Keys.NumPad1, false);
+				case Key.NumPad2: return (Keys.NumPad2, false);
+				case Key.NumPad3: return (Keys.NumPad3, false);
+				case Key.LeftControl: return (Keys.LControlKey, false);
+				case Key.LeftWin: return (Keys.LWin, false);
+				case Key.LeftAlt: return (Keys.LMenu, false);
+				case Key.Space: return (Keys.Space, false);
+				case Key.RightAlt: return (Keys.RMenu, false);
+				case Key.RightWin: return (Keys.RWin, false);
+				case Key.Menu: return (Keys.Apps, false);
+				case Key.RightControl: return (Keys.RControlKey, false);
+				case Key.LeftArrow: return (Keys.Left, false);
+				case Key.DownArrow: return (Keys.Down, false);
+				case Key.RightArrow: return (Keys.Right, false);
+				case Key.NumPad0: return (Keys.NumPad0, false);
+				case Key.Decimal: return (Keys.Decimal, false);
+				default: return (Keys.None, false);
 			}
 		}
 	}

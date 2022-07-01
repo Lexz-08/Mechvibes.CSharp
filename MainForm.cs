@@ -1,12 +1,15 @@
 ﻿using Gma.UserActivityMonitor;
 using Microsoft.Win32;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -118,23 +121,6 @@ namespace Mechvibes.CSharp
 		private Keys prevKey = Keys.None;
 		private int audioVolume = 50;
 
-		private void LoadSoundPacks()
-		{
-			cmbSelectedSoundPack.Items.Clear();
-
-			foreach (string soundpack in Directory.EnumerateDirectories(mechvibesFolder))
-				if (SoundPackHelper.IsMultikeyPack(soundpack + "\\config.json"))
-				{
-					SoundPack mechvibesPack = SoundPackHelper.LoadFromManifest(soundpack + "\\config.json");
-
-					soundpacks.Add(mechvibesPack);
-					cmbSelectedSoundPack.Items.Add(mechvibesPack.Name);
-				}
-
-			cmbSelectedSoundPack.Text = cmbSelectedSoundPack.Items[0].ToString();
-			currentSoundpack = soundpacks.Where(soundpack => soundpack.Name == cmbSelectedSoundPack.Text).First();
-		}
-
 		protected override void OnLoad(EventArgs e)
 		{
 			base.OnLoad(e);
@@ -145,17 +131,61 @@ namespace Mechvibes.CSharp
 			HookManager.KeyUp += new KeyEventHandler(Keyboard_KeyUp);
 		}
 
+		private void LoadSoundPacks()
+		{
+			foreach (string soundpack in Directory.EnumerateDirectories(mechvibesFolder))
+			{
+				if (SoundPackHelper.IsMultikeyPack(soundpack + "\\config.json") == true)
+				{
+					SoundPack mechvibesPack = SoundPackHelper.LoadFromManifest(soundpack + "\\config.json");
+
+					soundpacks.Add(mechvibesPack);
+					cmbSelectedSoundPack.Items.Add(mechvibesPack.Name);
+				}
+				else
+				{
+					SingleKeySoundPack mechvibesPack = SoundPackHelper.LoadSingleKeyFromManifest(soundpack + "\\config.json");
+
+					soundpacks.Add(mechvibesPack);
+					cmbSelectedSoundPack.Items.Add(mechvibesPack.Name);
+				}
+			}
+
+			cmbSelectedSoundPack.Text = cmbSelectedSoundPack.Items[0].ToString();
+			currentSoundpack = soundpacks.Where(soundpack => soundpack.Name == cmbSelectedSoundPack.Text).First();
+		}
+
 		private async void Keyboard_KeyDown(object sender, KeyEventArgs e)
 		{
 			await Task.Run(() =>
 			{
+				bool extended = ((KeyEventExtArgs)e).Extended;
+
 				if (e.KeyCode != prevKey)
 				{
-					WaveOutEvent outputDevice = new WaveOutEvent();
-					AudioFileReader audioFile = new AudioFileReader(currentSoundpack.GetBindedAudio(KeymapHelper.GetSoundPackKey(e.KeyCode)));
-					outputDevice.Init(audioFile);
-					outputDevice.Volume = audioVolume / 100.0f;
-					outputDevice.Play();
+					if (currentSoundpack.GetType() == typeof(SoundPack))
+					{
+						WaveOutEvent outputDevice = new WaveOutEvent();
+						AudioFileReader audioFile = new AudioFileReader(currentSoundpack.GetBindedAudio(KeymapHelper.GetSoundPackKey(e.KeyCode, extended)));
+						outputDevice.Init(audioFile);
+						outputDevice.Volume = audioVolume / 100.0f;
+						outputDevice.DesiredLatency = 0;
+						outputDevice.Play();
+					}
+					else if (currentSoundpack.GetType() == typeof(SingleKeySoundPack))
+					{
+						SingleKeySoundPack soundpack = (SingleKeySoundPack)currentSoundpack;
+
+						WaveOutEvent outputDevice = new WaveOutEvent();
+						AudioFileReader audioFile = new AudioFileReader(soundpack.AudioFile);
+						OffsetSampleProvider trimmedFile = new OffsetSampleProvider(audioFile);
+						AudioRange sampleRange = soundpack.GetBindedRange(KeymapHelper.GetSoundPackKey(e.KeyCode, extended));
+						trimmedFile.SkipOver = TimeSpan.FromMilliseconds(sampleRange.Position);
+						trimmedFile.Take = TimeSpan.FromMilliseconds(sampleRange.Duration);
+						outputDevice.Init(trimmedFile);
+						outputDevice.Volume = audioVolume / 100.0f;
+						outputDevice.DesiredLatency = 0;
+					}
 
 					prevKey = e.KeyCode;
 				}
