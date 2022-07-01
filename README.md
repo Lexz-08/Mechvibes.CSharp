@@ -134,7 +134,7 @@ Definitions:
 | 55       | Multiply        |
 | 74       | Subtract        |
 | 78       | Add             |
-| 3612     | Enter           |
+| 3612     | NumPad Enter    |
 | 83       | Decimal         |
 | 79       | NumPad 1        |
 | 80       | NumPad 2        |
