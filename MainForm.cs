@@ -297,7 +297,16 @@ namespace Mechvibes.CSharp
 					prevKey = e.KeyCode;
 
 					if (outputDevice != null)
-						outputDevice.PlaybackStopped += (s, ee) => { outputDevice.Dispose(); audioFile?.Dispose(); };
+						outputDevice.PlaybackStopped += (s, ee) =>
+						{
+							outputDevice.Dispose();
+							outputDevice = null;
+							audioFile?.Dispose();
+							audioFile = null;
+
+							GC.Collect();
+						};
+
 				}
 
 				GC.Collect();
