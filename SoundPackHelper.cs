@@ -79,7 +79,7 @@ namespace Mechvibes.CSharp
 				}
 			}
 
-			return new SingleKeySoundPack(name, Path.GetDirectoryName(JSONFile) + "\\" + packInfo["sound"], keybinds);
+			return new SingleKeySoundPack(name, Path.GetDirectoryName(JSONFile) + "\\" + packInfo.Value<string>("sound"), keybinds);
 		}
 
 		public static void SaveToManifest(SoundPack SoundPack, string JSONFile)

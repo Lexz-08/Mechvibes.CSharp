@@ -4,7 +4,6 @@ using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -125,10 +124,112 @@ namespace Mechvibes.CSharp
 		{
 			base.OnLoad(e);
 
-			LoadSoundPacks();
+			DownloadDefaultPacks();
 
 			HookManager.KeyDown += new KeyEventHandler(Keyboard_KeyDown);
 			HookManager.KeyUp += new KeyEventHandler(Keyboard_KeyUp);
+		}
+
+		private void DownloadDefaultPacks()
+		{
+			void Extract(string Resource, string File)
+			{
+				using (Stream s = Assembly.GetExecutingAssembly().GetManifestResourceStream(Resource))
+				using (BinaryReader br = new BinaryReader(s))
+				using (FileStream fs = new FileStream(File, FileMode.OpenOrCreate))
+				using (BinaryWriter bw = new BinaryWriter(fs))
+					bw.Write(br.ReadBytes((int)s.Length));
+			}
+
+			Assembly asm = Assembly.GetExecutingAssembly();
+
+			string[] nk_cream = asm.GetManifestResourceNames().Where(name => name.Contains("nk_cream")).ToArray();
+
+			Directory.CreateDirectory($"{Application.StartupPath}\\DefaultPacks");
+			Directory.CreateDirectory($"{Application.StartupPath}\\DefaultPacks\\cherrymx-black-abs");
+			Directory.CreateDirectory($"{Application.StartupPath}\\DefaultPacks\\cherrymx-black-pbt");
+			Directory.CreateDirectory($"{Application.StartupPath}\\DefaultPacks\\cherrymx-blue-abs");
+			Directory.CreateDirectory($"{Application.StartupPath}\\DefaultPacks\\cherrymx-blue-pbt");
+			Directory.CreateDirectory($"{Application.StartupPath}\\DefaultPacks\\cherrymx-brown-abs");
+			Directory.CreateDirectory($"{Application.StartupPath}\\DefaultPacks\\cherrymx-brown-pbt");
+			Directory.CreateDirectory($"{Application.StartupPath}\\DefaultPacks\\cherrymx-red-abs");
+			Directory.CreateDirectory($"{Application.StartupPath}\\DefaultPacks\\cherrymx-red-pbt");
+			Directory.CreateDirectory($"{Application.StartupPath}\\DefaultPacks\\eg-crystal-purple");
+			Directory.CreateDirectory($"{Application.StartupPath}\\DefaultPacks\\eg-oreo");
+			Directory.CreateDirectory($"{Application.StartupPath}\\DefaultPacks\\nk-cream");
+			Directory.CreateDirectory($"{Application.StartupPath}\\DefaultPacks\\topre-purple-hybrid-pbt");
+
+			Extract("Mechvibes.CSharp.DefaultPacks.cherrymx_black_abs.config.json", $"{Application.StartupPath}\\DefaultPacks\\cherrymx-black-abs\\config.json");
+			Extract("Mechvibes.CSharp.DefaultPacks.cherrymx_black_abs.sound.wav", $"{Application.StartupPath}\\DefaultPacks\\cherrymx-black-abs\\sound.wav");
+
+			Extract("Mechvibes.CSharp.DefaultPacks.cherrymx_black_pbt.config.json", $"{Application.StartupPath}\\DefaultPacks\\cherrymx-black-pbt\\config.json");
+			Extract("Mechvibes.CSharp.DefaultPacks.cherrymx_black_pbt.sound.wav", $"{Application.StartupPath}\\DefaultPacks\\cherrymx-black-pbt\\sound.wav");
+
+			Extract("Mechvibes.CSharp.DefaultPacks.cherrymx_blue_abs.config.json", $"{Application.StartupPath}\\DefaultPacks\\cherrymx-blue-abs\\config.json");
+			Extract("Mechvibes.CSharp.DefaultPacks.cherrymx_blue_abs.sound.wav", $"{Application.StartupPath}\\DefaultPacks\\cherrymx-blue-abs\\sound.wav");
+
+			Extract("Mechvibes.CSharp.DefaultPacks.cherrymx_blue_pbt.config.json", $"{Application.StartupPath}\\DefaultPacks\\cherrymx-blue-pbt\\config.json");
+			Extract("Mechvibes.CSharp.DefaultPacks.cherrymx_blue_pbt.sound.wav", $"{Application.StartupPath}\\DefaultPacks\\cherrymx-blue-pbt\\sound.wav");
+
+			Extract("Mechvibes.CSharp.DefaultPacks.cherrymx_brown_abs.config.json", $"{Application.StartupPath}\\DefaultPacks\\cherrymx-brown-abs\\config.json");
+			Extract("Mechvibes.CSharp.DefaultPacks.cherrymx_brown_abs.sound.wav", $"{Application.StartupPath}\\DefaultPacks\\cherrymx-brown-abs\\sound.wav");
+
+			Extract("Mechvibes.CSharp.DefaultPacks.cherrymx_brown_pbt.config.json", $"{Application.StartupPath}\\DefaultPacks\\cherrymx-brown-pbt\\config.json");
+			Extract("Mechvibes.CSharp.DefaultPacks.cherrymx_brown_pbt.sound.wav", $"{Application.StartupPath}\\DefaultPacks\\cherrymx-brown-pbt\\sound.wav");
+
+			Extract("Mechvibes.CSharp.DefaultPacks.cherrymx_red_abs.config.json", $"{Application.StartupPath}\\DefaultPacks\\cherrymx-red-abs\\config.json");
+			Extract("Mechvibes.CSharp.DefaultPacks.cherrymx_red_abs.sound.wav", $"{Application.StartupPath}\\DefaultPacks\\cherrymx-red-abs\\sound.wav");
+
+			Extract("Mechvibes.CSharp.DefaultPacks.cherrymx_red_pbt.config.json", $"{Application.StartupPath}\\DefaultPacks\\cherrymx-red-pbt\\config.json");
+			Extract("Mechvibes.CSharp.DefaultPacks.cherrymx_red_pbt.sound.wav", $"{Application.StartupPath}\\DefaultPacks\\cherrymx-red-pbt\\sound.wav");
+
+			Extract("Mechvibes.CSharp.DefaultPacks.eg_crystal_purple.config.json", $"{Application.StartupPath}\\DefaultPacks\\eg-crystal-purple\\config.json");
+			Extract("Mechvibes.CSharp.DefaultPacks.eg_crystal_purple.purple.wav", $"{Application.StartupPath}\\DefaultPacks\\eg-crystal-purple\\purple.wav");
+
+			Extract("Mechvibes.CSharp.DefaultPacks.eg_oreo.config.json", $"{Application.StartupPath}\\DefaultPacks\\eg-oreo\\config.json");
+			Extract("Mechvibes.CSharp.DefaultPacks.eg_oreo.oreo.wav", $"{Application.StartupPath}\\DefaultPacks\\eg-oreo\\oreo.wav");
+
+			Extract("Mechvibes.CSharp.DefaultPacks.topre_purple_hybrid_pbt.config.json", $"{Application.StartupPath}\\DefaultPacks\\topre-purple-hybrid-pbt\\config.json");
+			Extract("Mechvibes.CSharp.DefaultPacks.topre_purple_hybrid_pbt.sound.wav", $"{Application.StartupPath}\\DefaultPacks\\topre-purple-hybrid-pbt\\sound.wav");
+
+			foreach (string nk_cream_file in nk_cream)
+			{
+				string[] parts = nk_cream_file.Split('.');
+				string name = parts[parts.Length - 2];
+				string type = parts[parts.Length - 1];
+
+				Extract(nk_cream_file, $"{Application.StartupPath}\\DefaultPacks\\nk-cream\\{name}.{type}");
+			}
+
+			LoadDefaultPacks();
+		}
+
+		private void LoadDefaultPacks()
+		{
+			cmbSelectedSoundPack.Items.Clear();
+
+			foreach (string defaultpack in Directory.EnumerateDirectories($"{Application.StartupPath}\\DefaultPacks"))
+			{
+				if (SoundPackHelper.IsMultikeyPack(defaultpack + "\\config.json") == true)
+				{
+					SoundPack mechvibesPack = SoundPackHelper.LoadFromManifest(defaultpack + "\\config.json");
+
+					soundpacks.Add(mechvibesPack);
+					cmbSelectedSoundPack.Items.Add(mechvibesPack.Name);
+				}
+				else
+				{
+					SingleKeySoundPack mechvibesPack = SoundPackHelper.LoadSingleKeyFromManifest(defaultpack + "\\config.json");
+
+					soundpacks.Add(mechvibesPack);
+					cmbSelectedSoundPack.Items.Add(mechvibesPack.Name);
+				}
+			}
+
+			cmbSelectedSoundPack.Text = cmbSelectedSoundPack.Items[0].ToString();
+			currentSoundpack = soundpacks.Where(soundpack => soundpack.Name == cmbSelectedSoundPack.Text).First();
+
+			LoadSoundPacks();
 		}
 
 		private void LoadSoundPacks()
@@ -159,36 +260,47 @@ namespace Mechvibes.CSharp
 		{
 			await Task.Run(() =>
 			{
+				GC.Collect();
+
 				bool extended = ((KeyEventExtArgs)e).Extended;
 
 				if (e.KeyCode != prevKey)
 				{
+					WaveOutEvent outputDevice = null;
+					AudioFileReader audioFile = null;
+
 					if (currentSoundpack.GetType() == typeof(SoundPack))
 					{
-						WaveOutEvent outputDevice = new WaveOutEvent();
-						AudioFileReader audioFile = new AudioFileReader(currentSoundpack.GetBindedAudio(KeymapHelper.GetSoundPackKey(e.KeyCode, extended)));
+						outputDevice = new WaveOutEvent();
+						audioFile = new AudioFileReader(currentSoundpack.GetBindedAudio(KeymapHelper.GetSoundPackKey(e.KeyCode, extended)));
 						outputDevice.Init(audioFile);
 						outputDevice.Volume = audioVolume / 100.0f;
-						outputDevice.DesiredLatency = 0;
+						outputDevice.DesiredLatency = 10;
 						outputDevice.Play();
 					}
 					else if (currentSoundpack.GetType() == typeof(SingleKeySoundPack))
 					{
 						SingleKeySoundPack soundpack = (SingleKeySoundPack)currentSoundpack;
 
-						WaveOutEvent outputDevice = new WaveOutEvent();
-						AudioFileReader audioFile = new AudioFileReader(soundpack.AudioFile);
+						outputDevice = new WaveOutEvent();
+						audioFile = new AudioFileReader(soundpack.AudioFile);
 						OffsetSampleProvider trimmedFile = new OffsetSampleProvider(audioFile);
 						AudioRange sampleRange = soundpack.GetBindedRange(KeymapHelper.GetSoundPackKey(e.KeyCode, extended));
 						trimmedFile.SkipOver = TimeSpan.FromMilliseconds(sampleRange.Position);
 						trimmedFile.Take = TimeSpan.FromMilliseconds(sampleRange.Duration);
 						outputDevice.Init(trimmedFile);
 						outputDevice.Volume = audioVolume / 100.0f;
-						outputDevice.DesiredLatency = 0;
+						outputDevice.DesiredLatency = 10;
+						outputDevice.Play();
 					}
 
 					prevKey = e.KeyCode;
+
+					if (outputDevice != null)
+						outputDevice.PlaybackStopped += (s, ee) => { outputDevice.Dispose(); audioFile?.Dispose(); };
 				}
+
+				GC.Collect();
 			});
 		}
 
@@ -210,7 +322,7 @@ namespace Mechvibes.CSharp
 				trckVolume.Value = audioVolume = (int)numVolume.Value;
 		}
 
-		private void ReloadSoundPacks(object sender, EventArgs e) => LoadSoundPacks();
+		private void ReloadSoundPacks(object sender, EventArgs e) => LoadDefaultPacks();
 
 		private void OpenSoundPackFolder(object sender, EventArgs e) => Process.Start("explorer.exe", mechvibesFolder);
 
