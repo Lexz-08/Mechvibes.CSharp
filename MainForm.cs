@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -256,66 +257,65 @@ namespace Mechvibes.CSharp
 			currentSoundpack = soundpacks.Where(soundpack => soundpack.Name == cmbSelectedSoundPack.Text).First();
 		}
 
-		private async void Keyboard_KeyDown(object sender, KeyEventArgs e)
+		private void Keyboard_KeyDown(object sender, KeyEventArgs e)
 		{
-			await Task.Run(() =>
+			GC.Collect();
+
+			bool extended = ((KeyEventExtArgs)e).Extended;
+
+			if (e.KeyCode != prevKey)
 			{
-				GC.Collect();
+				WaveOutEvent outputDevice = null;
+				AudioFileReader audioFile = null;
 
-				bool extended = ((KeyEventExtArgs)e).Extended;
-
-				if (e.KeyCode != prevKey)
+				if (currentSoundpack.GetType() == typeof(SoundPack))
 				{
-					WaveOutEvent outputDevice = null;
-					AudioFileReader audioFile = null;
+					outputDevice = new WaveOutEvent();
+					audioFile = new AudioFileReader(currentSoundpack.GetBindedAudio(KeymapHelper.GetSoundPackKey(e.KeyCode, extended)));
+					outputDevice.Init(audioFile);
+					outputDevice.Volume = audioVolume / 100.0f;
+					outputDevice.DesiredLatency = 10;
+					outputDevice.Play();
+				}
+				else if (currentSoundpack.GetType() == typeof(SingleKeySoundPack))
+				{
+					SingleKeySoundPack soundpack = (SingleKeySoundPack)currentSoundpack;
 
-					if (currentSoundpack.GetType() == typeof(SoundPack))
-					{
-						outputDevice = new WaveOutEvent();
-						audioFile = new AudioFileReader(currentSoundpack.GetBindedAudio(KeymapHelper.GetSoundPackKey(e.KeyCode, extended)));
-						outputDevice.Init(audioFile);
-						outputDevice.Volume = audioVolume / 100.0f;
-						outputDevice.DesiredLatency = 10;
-						outputDevice.Play();
-					}
-					else if (currentSoundpack.GetType() == typeof(SingleKeySoundPack))
-					{
-						SingleKeySoundPack soundpack = (SingleKeySoundPack)currentSoundpack;
-
-						outputDevice = new WaveOutEvent();
-						audioFile = new AudioFileReader(soundpack.AudioFile);
-						OffsetSampleProvider trimmedFile = new OffsetSampleProvider(audioFile);
-						AudioRange sampleRange = soundpack.GetBindedRange(KeymapHelper.GetSoundPackKey(e.KeyCode, extended));
-						trimmedFile.SkipOver = TimeSpan.FromMilliseconds(sampleRange.Position);
-						trimmedFile.Take = TimeSpan.FromMilliseconds(sampleRange.Duration);
-						outputDevice.Init(trimmedFile);
-						outputDevice.Volume = audioVolume / 100.0f;
-						outputDevice.DesiredLatency = 10;
-						outputDevice.Play();
-					}
-
-					prevKey = e.KeyCode;
-
-					if (outputDevice != null)
-						outputDevice.PlaybackStopped += (s, ee) =>
-						{
-							outputDevice.Dispose();
-							outputDevice = null;
-							audioFile?.Dispose();
-							audioFile = null;
-
-							GC.Collect();
-						};
-
+					outputDevice = new WaveOutEvent();
+					audioFile = new AudioFileReader(soundpack.AudioFile);
+					OffsetSampleProvider trimmedFile = new OffsetSampleProvider(audioFile);
+					AudioRange sampleRange = soundpack.GetBindedRange(KeymapHelper.GetSoundPackKey(e.KeyCode, extended));
+					trimmedFile.SkipOver = TimeSpan.FromMilliseconds(sampleRange.Position);
+					trimmedFile.Take = TimeSpan.FromMilliseconds(sampleRange.Duration);
+					outputDevice.Init(trimmedFile);
+					outputDevice.Volume = audioVolume / 100.0f;
+					outputDevice.DesiredLatency = 10;
+					outputDevice.Play();
 				}
 
-				GC.Collect();
-			});
+				prevKey = e.KeyCode;
+
+				if (outputDevice != null)
+					outputDevice.PlaybackStopped += (s, ee) =>
+					{
+						GC.Collect();
+
+						outputDevice.Dispose();
+						outputDevice = null;
+						audioFile?.Dispose();
+						audioFile = null;
+
+						GC.Collect();
+					};
+
+			}
+
+			GC.Collect();
 		}
 
-		private async void Keyboard_KeyUp(object sender, KeyEventArgs e)
+		private void Keyboard_KeyUp(object sender, KeyEventArgs e)
 		{
-			if (e.KeyCode == prevKey) await Task.Run(() => prevKey = Keys.None);
+			if (e.KeyCode == prevKey) prevKey = Keys.None;
 		}
 
 		private void SoundPackSelected(object sender, EventArgs e)
