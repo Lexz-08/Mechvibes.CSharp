@@ -4,8 +4,8 @@ namespace Mechvibes.CSharp
 {
 	internal class SingleKeySoundPack : SoundPack
 	{
-		private List<(Key, AudioRange)> keybinds = new List<(Key, AudioRange)>();
-		private string audioFile;
+		private readonly List<(Key, AudioRange)> keybinds = new List<(Key, AudioRange)>();
+		private readonly string audioFile;
 
 		public new List<(Key, AudioRange)> Keybinds => keybinds;
 		public string AudioFile => audioFile;

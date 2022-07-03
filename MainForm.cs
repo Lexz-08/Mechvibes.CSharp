@@ -1,4 +1,4 @@
-﻿using Gma.UserActivityMonitor;
+﻿using Gma.System.MouseKeyHook;
 using Microsoft.Win32;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
@@ -10,7 +10,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -55,8 +54,6 @@ namespace Mechvibes.CSharp
 		}
 
 		#region Basic Window Functionality
-
-		private readonly string startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\";
 
 		[DllImport("user32.dll")]
 		private static extern IntPtr LoadCursorFromFile(string lpFilename);
@@ -115,7 +112,7 @@ namespace Mechvibes.CSharp
 		#region SoundPack Management
 
 		private readonly string mechvibesFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\mechvibes_custom";
-		private List<SoundPack> soundpacks = new List<SoundPack>();
+		private readonly List<SoundPack> soundpacks = new List<SoundPack>();
 		private SoundPack currentSoundpack;
 
 		private Keys prevKey = Keys.None;
@@ -127,8 +124,16 @@ namespace Mechvibes.CSharp
 
 			DownloadDefaultPacks();
 
-			HookManager.KeyDown += new KeyEventHandler(Keyboard_KeyDown);
-			HookManager.KeyUp += new KeyEventHandler(Keyboard_KeyUp);
+			IKeyboardMouseEvents hook = Hook.GlobalEvents();
+			hook.KeyDown += Keyboard_KeyDown;
+			hook.KeyUp += Keyboard_KeyUp;
+
+			FormClosing += (s, ee) =>
+			{
+				hook.KeyDown -= Keyboard_KeyDown;
+				hook.KeyUp -= Keyboard_KeyUp;
+				hook.Dispose();
+			};
 		}
 
 		private void DownloadDefaultPacks()
@@ -257,65 +262,78 @@ namespace Mechvibes.CSharp
 			currentSoundpack = soundpacks.Where(soundpack => soundpack.Name == cmbSelectedSoundPack.Text).First();
 		}
 
-		private void Keyboard_KeyDown(object sender, KeyEventArgs e)
+		private async void PlayAudio(string file, int volume)
 		{
-			GC.Collect();
-
-			bool extended = ((KeyEventExtArgs)e).Extended;
-
-			if (e.KeyCode != prevKey)
+			await Task.Run(() =>
 			{
-				WaveOutEvent outputDevice = null;
-				AudioFileReader audioFile = null;
+				WaveOutEvent output = new WaveOutEvent();
+				AudioFileReader audio = new AudioFileReader(file) { Volume = volume / 100.0f };
+				output.Init(audio);
 
-				if (currentSoundpack.GetType() == typeof(SoundPack))
+				output.PlaybackStopped += (s, e) =>
 				{
-					outputDevice = new WaveOutEvent();
-					audioFile = new AudioFileReader(currentSoundpack.GetBindedAudio(KeymapHelper.GetSoundPackKey(e.KeyCode, extended)));
-					outputDevice.Init(audioFile);
-					outputDevice.Volume = audioVolume / 100.0f;
-					outputDevice.DesiredLatency = 10;
-					outputDevice.Play();
-				}
-				else if (currentSoundpack.GetType() == typeof(SingleKeySoundPack))
-				{
-					SingleKeySoundPack soundpack = (SingleKeySoundPack)currentSoundpack;
+					output.Dispose();
+					audio.Dispose();
+				};
 
-					outputDevice = new WaveOutEvent();
-					audioFile = new AudioFileReader(soundpack.AudioFile);
-					OffsetSampleProvider trimmedFile = new OffsetSampleProvider(audioFile);
-					AudioRange sampleRange = soundpack.GetBindedRange(KeymapHelper.GetSoundPackKey(e.KeyCode, extended));
-					trimmedFile.SkipOver = TimeSpan.FromMilliseconds(sampleRange.Position);
-					trimmedFile.Take = TimeSpan.FromMilliseconds(sampleRange.Duration);
-					outputDevice.Init(trimmedFile);
-					outputDevice.Volume = audioVolume / 100.0f;
-					outputDevice.DesiredLatency = 10;
-					outputDevice.Play();
-				}
-
-				prevKey = e.KeyCode;
-
-				if (outputDevice != null)
-					outputDevice.PlaybackStopped += (s, ee) =>
-					{
-						GC.Collect();
-
-						outputDevice.Dispose();
-						outputDevice = null;
-						audioFile?.Dispose();
-						audioFile = null;
-
-						GC.Collect();
-					};
-
-			}
+				output.Play();
+			});
 
 			GC.Collect();
 		}
 
-		private void Keyboard_KeyUp(object sender, KeyEventArgs e)
+		private async void PlayTrimmedAudio(string file, int volume, AudioRange range)
 		{
-			if (e.KeyCode == prevKey) prevKey = Keys.None;
+			await Task.Run(() =>
+			{
+				WaveOutEvent output = new WaveOutEvent();
+				AudioFileReader audio = new AudioFileReader(file) { Volume = volume / 100.0f };
+				OffsetSampleProvider trimmed = new OffsetSampleProvider(audio)
+				{
+					SkipOver = TimeSpan.FromMilliseconds(range.Position),
+					Take = TimeSpan.FromMilliseconds(range.Duration),
+				};
+				output.Init(trimmed);
+
+				output.PlaybackStopped += (s, e) =>
+				{
+					output.Dispose();
+					audio.Dispose();
+				};
+
+				output.Play();
+			});
+		}
+
+		private async void Keyboard_KeyDown(object sender, KeyEventArgs e)
+		{
+			GC.Collect();
+
+			await Task.Run(() =>
+			{
+				GC.Collect();
+
+				if (e.KeyCode != prevKey)
+				{
+					if (currentSoundpack.GetType() == typeof(SoundPack))
+						PlayAudio(currentSoundpack.GetBindedAudio(KeymapHelper.GetSoundPackKey(e.KeyCode, false)), audioVolume);
+					else if (currentSoundpack.GetType() == typeof(SingleKeySoundPack))
+					{
+						SingleKeySoundPack soundpack = (SingleKeySoundPack)currentSoundpack;
+
+						PlayTrimmedAudio(soundpack.AudioFile, audioVolume, soundpack.GetBindedRange(KeymapHelper.GetSoundPackKey(e.KeyCode, false)));
+					}
+
+					prevKey = e.KeyCode;
+				}
+			});
+
+			GC.Collect();
+		}
+
+		private async void Keyboard_KeyUp(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == prevKey) await Task.Run(() => prevKey = Keys.None );
 		}
 
 		private void SoundPackSelected(object sender, EventArgs e)

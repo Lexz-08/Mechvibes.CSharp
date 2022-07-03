@@ -51,6 +51,10 @@
     <ApplicationIcon>mechvibes-icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Gma.System.MouseKeyHook, Version=5.6.130.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>packages\MouseKeyHook.5.6.0\lib\net40\Gma.System.MouseKeyHook.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Microsoft.Win32.Registry, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>packages\Microsoft.Win32.Registry.4.7.0\lib\net461\Microsoft.Win32.Registry.dll</HintPath>
       <Private>False</Private>
@@ -105,21 +109,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AudioRange.cs" />
-    <Compile Include="Gma.UserActivityMonitor\KeyDownExtArgs.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Gma.UserActivityMonitor\GlobalEventProvider.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Gma.UserActivityMonitor\HookManager.Callbacks.cs" />
-    <Compile Include="Gma.UserActivityMonitor\HookManager.cs" />
-    <Compile Include="Gma.UserActivityMonitor\HookManager.Structures.cs" />
-    <Compile Include="Gma.UserActivityMonitor\HookManager.Windows.cs" />
-    <Compile Include="Gma.UserActivityMonitor\MouseEventExtArgs.cs" />
     <Compile Include="Key.cs" />
     <Compile Include="Keymap.cs" />
     <Compile Include="KeymapHelper.cs" />
@@ -236,6 +231,7 @@
     <EmbeddedResource Include="DefaultPacks\eg-crystal-purple\purple.wav" />
     <EmbeddedResource Include="DefaultPacks\eg-oreo\oreo.wav" />
     <EmbeddedResource Include="DefaultPacks\topre-purple-hybrid-pbt\sound.wav" />
+    <EmbeddedResource Include="Libraries\Gma.System.MouseKeyHook.dll" />
     <Content Include="mechvibes-icon.ico" />
     <None Include="Resources\keyboard.jpeg" />
   </ItemGroup>

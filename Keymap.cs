@@ -2,8 +2,8 @@
 {
 	internal class Keymap
 	{
-		private Key keybind;
-		private string audioFile;
+		private readonly Key keybind;
+		private readonly string audioFile;
 
 		public Key Keybind => keybind;
 		public string AudioFile => audioFile;

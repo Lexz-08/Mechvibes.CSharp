@@ -5,8 +5,8 @@ namespace Mechvibes.CSharp
 {
 	internal class SoundPack
 	{
-		private string packName;
-		private List<Keymap> keybinds;
+		private readonly string packName;
+		private readonly List<Keymap> keybinds;
 
 		public string Name => packName;
 		public List<Keymap> Keybinds => keybinds;
@@ -35,17 +35,9 @@ namespace Mechvibes.CSharp
 				for (int i = 0; i < keybinds.Count - 1; i++)
 					for (int j = 1; j < keybinds.Count; j++)
 						if (KeymapHelper.GetCodeFromKey(keybinds[j].Keybind) > KeymapHelper.GetCodeFromKey(keybinds[i].Keybind))
-						{
-							Keymap temp_ = keybinds[i];
+							(keybinds[j], keybinds[i]) = (keybinds[i], keybinds[j]);
 
-							keybinds[i] = keybinds[j];
-							keybinds[j] = temp_;
-						}
-
-				Keymap temp__ = keybinds[0];
-
-				keybinds[0] = keybinds[keybinds.Count - 1];
-				keybinds[keybinds.Count - 1] = temp__;
+				(keybinds[keybinds.Count - 1], keybinds[0]) = (keybinds[0], keybinds[keybinds.Count - 1]);
 			}
 		}
 

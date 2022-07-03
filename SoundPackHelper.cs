@@ -65,9 +65,8 @@ namespace Mechvibes.CSharp
 			foreach (JProperty keybind in defines.Properties())
 			{
 				Key key = KeymapHelper.GetKeyFromManifest(int.Parse(keybind.Name));
-				JArray audioPoints = defines[keybind.Name] as JArray;
 
-				if (audioPoints != null)
+				if (defines[keybind.Name] is JArray audioPoints)
 				{
 					AudioRange audioInfo = new AudioRange
 					{
