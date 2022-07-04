@@ -266,7 +266,11 @@ namespace Mechvibes.CSharp
 		{
 			await Task.Run(() =>
 			{
-				WaveOutEvent output = new WaveOutEvent { Volume = volume / 100.0f };
+				WaveOutEvent output = new WaveOutEvent
+				{
+					Volume = volume / 100.0f,
+					NumberOfBuffers = 30,
+				};
 				AudioFileReader audio = new AudioFileReader(file);
 				output.Init(audio);
 
@@ -286,7 +290,11 @@ namespace Mechvibes.CSharp
 		{
 			await Task.Run(() =>
 			{
-				WaveOutEvent output = new WaveOutEvent { Volume = volume / 100.0f };
+				WaveOutEvent output = new WaveOutEvent
+				{
+					Volume = volume / 100.0f,
+					NumberOfBuffers = 30,
+				};
 				AudioFileReader audio = new AudioFileReader(file);
 				OffsetSampleProvider trimmed = new OffsetSampleProvider(audio)
 				{
