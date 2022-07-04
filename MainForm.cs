@@ -266,8 +266,8 @@ namespace Mechvibes.CSharp
 		{
 			await Task.Run(() =>
 			{
-				WaveOutEvent output = new WaveOutEvent();
-				AudioFileReader audio = new AudioFileReader(file) { Volume = volume / 100.0f };
+				WaveOutEvent output = new WaveOutEvent { Volume = volume / 100.0f };
+				AudioFileReader audio = new AudioFileReader(file);
 				output.Init(audio);
 
 				output.PlaybackStopped += (s, e) =>
@@ -286,8 +286,8 @@ namespace Mechvibes.CSharp
 		{
 			await Task.Run(() =>
 			{
-				WaveOutEvent output = new WaveOutEvent();
-				AudioFileReader audio = new AudioFileReader(file) { Volume = volume / 100.0f };
+				WaveOutEvent output = new WaveOutEvent { Volume = volume / 100.0f };
+				AudioFileReader audio = new AudioFileReader(file);
 				OffsetSampleProvider trimmed = new OffsetSampleProvider(audio)
 				{
 					SkipOver = TimeSpan.FromMilliseconds(range.Position),
