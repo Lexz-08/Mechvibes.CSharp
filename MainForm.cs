@@ -270,6 +270,7 @@ namespace Mechvibes.CSharp
 				{
 					Volume = volume / 100.0f,
 					NumberOfBuffers = 30,
+					DesiredLatency = 325,
 				};
 				AudioFileReader audio = new AudioFileReader(file);
 				output.Init(audio);
@@ -294,6 +295,7 @@ namespace Mechvibes.CSharp
 				{
 					Volume = volume / 100.0f,
 					NumberOfBuffers = 30,
+					DesiredLatency = 325,
 				};
 				AudioFileReader audio = new AudioFileReader(file);
 				OffsetSampleProvider trimmed = new OffsetSampleProvider(audio)
