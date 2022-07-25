@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -133,7 +134,56 @@ namespace Mechvibes.CSharp
 				hook.KeyDown -= Keyboard_KeyDown;
 				hook.KeyUp -= Keyboard_KeyUp;
 				hook.Dispose();
+
+				JObject settings = new JObject();
+				settings.Add(new JProperty("pack", cmbSelectedSoundPack.Text));
+				settings.Add(new JProperty("volume", numVolume.Value));
+				File.WriteAllText($"{Application.StartupPath}\\settings.json", settings.ToString().Replace("  ", "\t"));
 			};
+
+			if (!File.Exists($"{Application.StartupPath}\\settings.json"))
+				File.WriteAllText($"{Application.StartupPath}\\settings.json", "{" +
+					"\n\t\"pack\": \"CherryMX Black - ABS keycaps\"," +
+					"\n\t\"volume\": 50" +
+					"\n}");
+			else
+			{
+				JObject settings = JObject.Parse(File.ReadAllText($"{Application.StartupPath}\\settings.json"));
+
+				if (settings.ContainsKey("pack"))
+				{
+					string pack = settings.Value<string>("pack");
+
+					if (soundpacks.Any(soundpack => soundpack.Name == pack))
+					{
+						cmbSelectedSoundPack.Text = pack;
+						SoundPackSelected(this, e);
+					}
+					else File.WriteAllText($"{Application.StartupPath}\\settings.json", File.ReadAllText($"{Application.StartupPath}\\settings.json").Replace("\"pack\": \"" + pack + "\"", "\"pack\": \"CherryMX Black - ABS keycaps\""));
+				}
+				else
+				{
+					settings.AddFirst(new JProperty("pack", "CherryMX Black - ABS keycaps"));
+					File.WriteAllText($"{Application.StartupPath}\\settings.json", settings.ToString());
+				}
+
+				if (settings.ContainsKey("volume"))
+				{
+					int volume = settings.Value<int>("volume");
+
+					if (numVolume.Minimum <= volume && volume <= numVolume.Maximum)
+					{
+						numVolume.Value = volume;
+						trckVolume.Value = volume;
+					}
+					else File.WriteAllText($"{Application.StartupPath}\\settings.json", File.ReadAllText($"{Application.StartupPath}\\settings.json").Replace("\"volume\": " + volume, "\"volume\": 50"));
+				}
+				else
+				{
+					settings.Add(new JProperty("volume", 50));
+					File.WriteAllText($"{Application.StartupPath}\\settings.json", settings.ToString());
+				}
+			}
 		}
 
 		private void DownloadDefaultPacks()
