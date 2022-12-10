@@ -17,6 +17,7 @@ namespace Mechvibes.CSharp
 			Application.SetCompatibleTextRenderingDefault(false);
 
 			AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+			AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
 
 			Application.Run(new MainForm());
 		}
@@ -33,6 +34,11 @@ namespace Mechvibes.CSharp
 
 				return Assembly.Load(dll);
 			}
+		}
+
+		private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+		{
+			Application.Restart();
 		}
 	}
 }

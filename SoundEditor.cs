@@ -86,6 +86,28 @@ namespace Mechvibes.CSharp
 				input.Text = string.Empty;
 		}
 
+		// from https://stackoverflow.com/questions/6198392/check-whether-a-path-is-valid
+		private bool IsValidPath(string path, bool allowRelativePaths = false)
+		{
+			bool isValid = false;
+
+			try
+			{
+				string fullPath = Path.GetFullPath(path);
+
+				if (allowRelativePaths)
+					isValid = Path.IsPathRooted(path);
+				else
+				{
+					string root = Path.GetPathRoot(path);
+					isValid = string.IsNullOrEmpty(root.Trim(new char[] { '\\', '/' })) == false;
+				}
+			}
+			catch { isValid = false; }
+
+			return isValid;
+		}
+
 		private void ImportPackFromManifest(object sender, EventArgs e)
 		{
 			using (OpenFileDialog ofd = new OpenFileDialog
@@ -95,12 +117,16 @@ namespace Mechvibes.CSharp
 			}) if (ofd.ShowDialog() == DialogResult.OK)
 				{
 					SoundPack loadedPack = SoundPackHelper.LoadFromManifest(ofd.FileName);
-					txtPackName.Text = loadedPack.Name;
 
-					foreach (Keymap keymap in loadedPack.Keybinds)
-						foreach (TextBox input in Controls.OfType<TextBox>().Where(textbox => textbox.Name != "txtPackName"))
-							if (input.Name == keymap.Keybind.ToString())
-								input.Text = Path.GetFileName(keymap.AudioFile);
+					if (IsValidPath(loadedPack.Keybinds[0].AudioFile))
+					{
+						txtPackName.Text = loadedPack.Name;
+
+						foreach (Keymap keymap in loadedPack.Keybinds)
+							foreach (TextBox input in Controls.OfType<TextBox>().Where(textbox => textbox.Name != "txtPackName"))
+								if (input.Name == keymap.Keybind.ToString())
+									input.Text = Path.GetFileName(keymap.AudioFile);
+					}
 				}
 		}
 
