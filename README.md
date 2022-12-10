@@ -2,6 +2,20 @@
 ## Description
 A C# remake of Mechvibes, with compatibility of the soundpacks so that you can load your soundpacks into both programs.
 
+## `settings.json` Format
+The currently set information in the program is saved when it's closed.
+```json
+{
+    "pack": "SOUNDPACK_NAME",
+    "volume": "PACK_VOLUME"
+}
+```
+Definitions:
+  * `SOUNDPACK_NAME`: The name used to identify the soundpack you'd like to load in the program.
+    * Default is `CherryMX Black - ABS keycaps`
+  * `PACK_VOLUME`: The volume of the soundpack when a key is pressed (can be modified during runtime in the program).
+    * Default is `50`
+
 ## Download
 [Setup Video (mkv)](https://github.com/Lexz-08/Mechvibes.CSharp/raw/master/Setup%20Mechvibes%20Folder%20Without%20Mechvibes%20Installed.mkv)<br/>
 [Release](https://github.com/Lexz-08/Mechvibes.CSharp/releases/mechvibes-remake) - [**Mechvibes.CSharp.exe**](https://github.com/Lexz-08/Mechvibes.CSharp/releases/download/mechvibes-remake/Mechvibes.CSharp.exe)
