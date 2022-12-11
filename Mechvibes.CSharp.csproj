@@ -172,9 +172,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Libraries\WinTitleBitmaps.dll" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Libraries\Microsoft.Win32.Registry.dll" />
     <EmbeddedResource Include="Libraries\NAudio.Asio.dll" />
     <EmbeddedResource Include="Libraries\NAudio.Core.dll" />
@@ -232,6 +229,7 @@
     <EmbeddedResource Include="DefaultPacks\eg-oreo\oreo.wav" />
     <EmbeddedResource Include="DefaultPacks\topre-purple-hybrid-pbt\sound.wav" />
     <EmbeddedResource Include="Libraries\Gma.System.MouseKeyHook.dll" />
+    <EmbeddedResource Include="Libraries\WinTitleBitmaps.dll" />
     <Content Include="mechvibes-icon.ico" />
     <None Include="Resources\keyboard.jpeg" />
   </ItemGroup>

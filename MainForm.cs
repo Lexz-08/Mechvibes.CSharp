@@ -5,6 +5,7 @@ using NAudio.Wave.SampleProviders;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -18,6 +19,27 @@ namespace Mechvibes.CSharp
 {
 	public partial class MainForm : Form
 	{
+		/// <summary>
+		/// Different states of the program
+		/// </summary>
+		public enum ProgramState
+		{
+			/// <summary>
+			/// Window is visible to the user
+			/// </summary>
+			Visible,
+
+			/// <summary>
+			/// Window is minimized the the taskbar
+			/// </summary>
+			Minimized,
+
+			/// <summary>
+			/// Window is minimized to the system tray
+			/// </summary>
+			MinimizedToTray
+		}
+
 		public MainForm()
 		{
 			InitializeComponent();
@@ -52,6 +74,27 @@ namespace Mechvibes.CSharp
 				iconGraphics.DrawIcon(Icon, new Rectangle(0, 0, 32, 32));
 
 			picIcon.Image = iconBitmap;
+
+			Timer t = new Timer { Interval = 1000 };
+			t.Tick += (s, e) =>
+			{
+				string[] args = Environment.GetCommandLineArgs();
+				args = args.Where(str_Argument => str_Argument != args.First()).ToArray();
+				if (args.Length > 1)
+					switch ((ProgramState)TypeDescriptor.GetConverter(typeof(ProgramState)).ConvertFromString(args[0].Substring(2)))
+					{
+						case ProgramState.Minimized:
+							MinimizeWindow(this, EventArgs.Empty);
+							break;
+						case ProgramState.MinimizedToTray:
+							MinimizeToSystemTray(this, EventArgs.Empty);
+							break;
+						default: break;
+					}
+
+				t.Dispose();
+			};
+			t.Start();
 		}
 
 		#region Basic Window Functionality
@@ -65,6 +108,16 @@ namespace Mechvibes.CSharp
 		[DllImport("user32.dll")]
 		private static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
 
+		public ProgramState State { get; set; } = ProgramState.Visible;
+
+		protected override void OnFormClosing(FormClosingEventArgs e)
+		{
+			base.OnFormClosing(e);
+
+			trayicon.Visible = false;
+			trayicon.Dispose();
+		}
+
 		private void DragForm(object sender, MouseEventArgs e)
 		{
 			if (e.Button == MouseButtons.Left)
@@ -76,14 +129,17 @@ namespace Mechvibes.CSharp
 		private void UnminimizeWindowToNormal(object sender, EventArgs e)
 		{
 			Visible = true;
+			State = ProgramState.Visible;
 		}
 		private void MinimizeToSystemTray(object sender, EventArgs e)
 		{
 			Visible = false;
+			State = ProgramState.MinimizedToTray;
 		}
 		private void MinimizeWindow(object sender, EventArgs e)
 		{
 			WindowState = FormWindowState.Minimized;
+			State = ProgramState.Minimized;
 		}
 		private void CloseWindow(object sender, EventArgs e)
 		{
@@ -316,22 +372,26 @@ namespace Mechvibes.CSharp
 		{
 			await Task.Run(() =>
 			{
-				WaveOutEvent output = new WaveOutEvent
+				try
 				{
-					Volume = volume / 100.0f,
-					NumberOfBuffers = 30,
-					DesiredLatency = 325,
-				};
-				AudioFileReader audio = new AudioFileReader(file);
-				output.Init(audio);
+					WaveOutEvent output = new WaveOutEvent
+					{
+						Volume = volume / 100.0f,
+						NumberOfBuffers = 30,
+						DesiredLatency = 150,
+					};
+					AudioFileReader audio = new AudioFileReader(file);
+					output.Init(audio);
 
-				output.PlaybackStopped += (s, e) =>
-				{
-					output.Dispose();
-					audio.Dispose();
-				};
+					output.PlaybackStopped += (s, e) =>
+					{
+						output.Dispose();
+						audio.Dispose();
+					};
 
-				output.Play();
+					output.Play();
+				}
+				catch { return; }
 			});
 
 			GC.Collect();
